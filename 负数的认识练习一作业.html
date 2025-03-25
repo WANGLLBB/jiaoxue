@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>数学练习（含题目图解）</title>
+    <style>
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; }
+        .question { margin: 30px 0; padding: 20px; border: 1px solid #eee; }
+        input { 
+            width: 120px; padding: 8px; border: 2px solid #ddd; margin: 5px 10px;
+        }
+        .correct { border-color: #4CAF50!important; }
+        .wrong { border-color: #f44336!important; }
+        button { 
+            background: #2196F3; color: white; padding: 12px 25px; 
+            border: none; border-radius: 4px; cursor: pointer; margin-top: 20px;
+        }
+        .diagram {
+            background: #f8f9fa; padding: 15px; margin: 15px 0; 
+            border-left: 4px solid #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📝 正负数应用练习（含题目示意图）</h2>
+
+        <!-- 问题1 -->
+        <div class="question">
+            <h3>1. 月球温度记录 🌕</h3>
+            <p>白天温度可达零上127℃，记作<input type="text" id="q1_1">℃<br>
+            夜间温度可达零下183℃，记作<input type="text" id="q1_2">℃</p>
+        </div>
+
+        <!-- 问题2 -->
+        <div class="question">
+            <h3>2. 时区对照表 🌍</h3>
+            <div class="diagram">
+                <strong>原题图示：</strong><br>
+                ▷ 伦敦 4:00<br>
+                ▷ 巴黎 5:00<br>
+                ▷ <mark>北京 12:00</mark><br>
+                ▷ 东京 13:00<br>
+                ▷ 悉尼 15:00<br>
+                <small>（以北京时间为基准0时）</small>
+            </div>
+            <p>悉尼时间：<input type="text" id="q2_1">时<br>
+               伦敦时间：<input type="text" id="q2_2">时</p>
+        </div>
+
+        <!-- 问题4 -->
+        <div class="question">
+            <h3>4. 海拔示意图 🏔️</h3>
+            <div class="diagram">
+                <div style="position:relative;height:150px">
+                    <div style="position:absolute;top:0;left:30%">▲ 珠穆朗玛峰</div>
+                    <div style="position:absolute;bottom:10px;left:30%">海平面</div>
+                    <div style="position:absolute;bottom:-30px;left:30%">▼ 吐鲁番盆地</div>
+                    <div style="position:absolute;left:50%">
+                        <div style="border-left:2px dashed #666;height:100px"></div>
+                        <div>+8848.86m</div>
+                        <div style="margin-top:80px">-154.31m</div>
+                    </div>
+                </div>
+            </div>
+            <p>珠峰海拔：<input type="text" id="q4_1">m<br>
+               吐鲁番海拔：<input type="text" id="q4_2">m</p>
+        </div>
+
+        <button onclick="checkAnswers()">✅ 核对答案</button>
+    </div>
+
+    <script>
+        // 验证逻辑保持不变
+        const answers = {
+            q1_1: "+127", q1_2: "-183",
+            q2_1: "+2",   q2_2: "-8",
+            q4_1: "+8848.86", q4_2: "-154.31"
+        };
+
+        function checkAnswers() {
+            document.querySelectorAll(".feedback").forEach(el => el.remove());
+            document.querySelectorAll("input").forEach(input => {
+                input.classList.remove("correct", "wrong");
+            });
+
+            for (const [id, correct] of Object.entries(answers)) {
+                const input = document.getElementById(id);
+                const value = input.value.trim();
+                
+                if (value === correct) {
+                    input.classList.add("correct");
+                } else {
+                    input.classList.add("wrong");
+                    const hint = document.createElement("span");
+                    hint.className = "feedback";
+                    hint.innerHTML = "⚠️ 检查符号和数值";
+                    input.parentNode.insertBefore(hint, input.nextSibling);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
