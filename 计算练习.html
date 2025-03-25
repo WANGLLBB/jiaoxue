@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>计算小达人</title>
+    <style>
+        /* 保留原有样式 */
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            font-size: 2.5em;
+            color: #ff6b6b;
+            text-shadow: 2px 2px #ffe66d;
+            margin-bottom: 30px;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .control-panel {
+            width: 20%;
+            padding: 15px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+        .number-range {
+            width: 20%;
+            padding: 15px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 20px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 12px;
+            background: #ff9a9e;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background: #ff6b6b;
+        }
+        .main-area {
+            width: 50%;
+            text-align: center;
+            padding: 30px;
+        }
+        #equation {
+            font-size: 4em;
+            margin: 30px 0;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .selected {
+            background: #4ecdc4 !important;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>计算小达人 ✨</header>
+    
+    <div class="container">
+        <!-- 左侧运算符选择 -->
+        <div class="control-panel">
+            <button onclick="selectOperator('+')">➕ 加法</button>
+            <button onclick="selectOperator('-')">➖ 减法</button>
+            <button onclick="selectOperator('×')">✖️ 乘法</button>
+            <button onclick="selectOperator('÷')">➗ 除法</button>
+        </div>
+
+        <!-- 中间主区域 -->
+        <div class="main-area">
+            <div id="equation">?</div>
+            <div class="controls">
+                <button onclick="start()" style="background: #4ecdc4;">开始出题 🚀</button>
+                <button onclick="stop()" style="background: #ff6b6b;">停止出题 🛑</button>
+                <br><br>
+                抽选人数：
+                <select id="count">
+                    <option value="1">1人</option>
+                    <option value="2">2人</option>
+                    <option value="3">3人</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 右侧数字位数选择 -->
+        <div class="number-range">
+            <h3>第一个数</h3>
+            <button onclick="selectDigit('first', 1)">一位数</button>
+            <button onclick="selectDigit('first', 2)">两位数</button>
+            <button onclick="selectDigit('first', 3)">三位数</button>
+            
+            <h3 style="margin-top:30px;">第二个数</h3>
+            <button onclick="selectDigit('second', 1)">一位数</button>
+            <button onclick="selectDigit('second', 2)">两位数</button>
+            <button onclick="selectDigit('second', 3)">三位数</button>
+        </div>
+    </div>
+
+    <script>
+        let isRolling = false;
+        let currentOperator = '+';
+        let digitRanges = {
+            first: { min: 0, max: 9 },  // 默认一位数
+            second: { min: 0, max: 9 }
+        };
+        let intervalId;
+
+        // 选择数字位数
+        function selectDigit(target, digits) {
+            const buttons = document.querySelectorAll(`button[onclick*="${target}"]`);
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            
+            // 设置选中样式
+            event.target.classList.add('selected');
+            
+            // 更新数值范围
+            switch(digits) {
+                case 1:
+                    digitRanges[target] = { min: 0, max: 9 };
+                    break;
+                case 2:
+                    digitRanges[target] = { min: 10, max: 99 };
+                    break;
+                case 3:
+                    digitRanges[target] = { min: 100, max: 999 };
+                    break;
+            }
+        }
+
+        // 生成指定范围的随机数
+        function generateNumber(target) {
+            const range = digitRanges[target];
+            return Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+        }
+
+        function start() {
+            if (isRolling) return;
+            isRolling = true;
+            const count = parseInt(document.getElementById('count').value);
+            
+            intervalId = setInterval(() => {
+                let equation = '';
+                for (let i = 0; i < count; i++) {
+                    const num1 = generateNumber('first');
+                    const num2 = generateNumber('second');
+                    equation += `
+                        <div class="problem" 
+                            onclick="showResult(this)"
+                            data-num1="${num1}"
+                            data-op="${currentOperator}"
+                            data-num2="${num2}">
+                            ${num1} ${currentOperator} ${num2}
+                        </div>
+                    `;
+                }
+                document.getElementById('equation').innerHTML = equation;
+            }, 100);
+            
+            document.getElementById('equation').classList.add('rolling');
+        }
+
+        function stop() {
+            clearInterval(intervalId);
+            isRolling = false;
+            document.getElementById('equation').classList.remove('rolling');
+        }
+
+        // 显示结果函数
+        function showResult(element) {
+            const num1 = parseInt(element.dataset.num1);
+            const op = element.dataset.op;
+            const num2 = parseInt(element.dataset.num2);
+            let result = '';
+            
+            switch(op) {
+                case '+': 
+                    result = num1 + num2;
+                    break;
+                case '-': 
+                    result = Math.max(num1 - num2, num2 - num1); // 保证非负数
+                    break;
+                case '×': 
+                    result = num1 * num2;
+                    break;
+                case '÷': 
+                    result = (num1 / num2).toFixed(2);
+                    break;
+            }
+            
+            element.innerHTML = `${num1} ${op} ${num2} = <span style="color:#ff6b6b;">${result}</span>`;
+            element.style.background = '#e3f2fd';
+            element.onclick = null;
+        }
+    </script>
+</body>
+</html>
